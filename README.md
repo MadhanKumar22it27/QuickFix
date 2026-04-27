@@ -39,4 +39,18 @@ This app can use GitHub Actions for CI. The following workflows are configured:
 ### License
 
 mit
-First commit
+
+### Answer the Questions
+
+Section-A2
+
+1. what each config file is for, and what breaks if you accidentally put a secret in common_site_config.json
+        site_config.json - Each site have the site_config.json file. it contains the details about the  site such as the db name, db password and etc.
+
+        If you accidentally put a secret like API key in common_site_config.json, it becomes accessible for the all sites
+
+2. list the 4 processes bench start launches (web, worker, scheduler, socketio) and explain what happens to background jobs if the worker process crashes.
+
+        The 4 processes are web.1, socketio.1, schedule.1, and worker.1
+
+        If the worker process crashes, then background jobs are queued
