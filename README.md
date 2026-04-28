@@ -54,3 +54,21 @@ Section-A2
         The 4 processes are web.1, socketio.1, schedule.1, and worker.1
 
         If the worker process crashes, then background jobs are queued
+
+Section C1
+
+1. When you append a row to Job Card.parts_used and save, what 4 columns does Frappe automatically set on the child table row?
+
+        The 4 columns are
+                parent - parent doc name
+                parent type - parent DocType
+                parent field - field name
+                idx - order of the row
+
+2. What is the DB table name for the Part Usage Entry DocType?
+
+        The DB table name for the Part Usage Entry DocType is tabPart Usage Entry.
+
+3. If you delete row at idx=2 and re-save, what happens to idx values of remaining rows?
+
+        when we delete a row at idx=2 and resave, it automatically resequenced like (1, 2)        
