@@ -2,6 +2,7 @@
 # For license information, please see license.txt
 
 import frappe
+from frappe import _
 from frappe.model.document import Document
 
 
@@ -25,7 +26,7 @@ class JobCard(Document):
 
 		for row in self.parts_used:
 			if row.quantity <= 0:
-				frappe.throw(f"Quantity must be greater than 0 for {row.part}")
+				frappe.throw(_("Quantity must be greater than 0 for {0}").format(row.part))
 
 			row.total_price = row.quantity * row.unit_price
 			total += row.total_price
@@ -35,7 +36,7 @@ class JobCard(Document):
 
 	def before_submit(self):
 		if self.status != "Ready for Delivery":
-			frappe.throw("Only Ready for Delivery jobs can be submitted")
+			frappe.throw(_("Only Ready for Delivery jobs can be submitted"))
 
 	def on_submit(self):
 		for row in self.parts_used:
@@ -43,7 +44,7 @@ class JobCard(Document):
 				current_stock = frappe.db.get_value("Spare Part", row.part, "stock_qty") or 0
 
 				if current_stock < row.quantity:
-					frappe.throw(f"Not enough stock for {row.part}")
+					frappe.throw(_("Not enough stock for {0}").format(row.part))
 
 				frappe.db.set_value("Spare Part", row.part, "stock_qty", current_stock - row.quantity)
 
@@ -65,10 +66,12 @@ class JobCard(Document):
 			invoice.insert(ignore_permissions=True)
 
 	def on_cancel(self):
-		self.status = "Cancelled"
+		self.db_set("status", "Cancelled")
 
 		for row in self.parts_used:
 			if row.part:
 				current_stock = frappe.db.get_value("Spare Part", row.part, "stock_qty") or 0
 
-				frappe.db.set_value("Spare Part", row.part, "stock_qty", current_stock + row.quantity)
+				frappe.db.set_value(
+					"Spare Part", row.part, "stock_qty", current_stock + row.quantity, update_modified=False
+				)
