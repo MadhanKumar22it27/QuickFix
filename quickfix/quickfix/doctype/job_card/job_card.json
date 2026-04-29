@@ -16,7 +16,7 @@
   "problem_description",
   "assignment_and_diagonsis_section",
   "assigned_technician",
-  "diagonsis_notes",
+  "diagnosis_notes",
   "estimated_cost",
   "diagnosis_date",
   "priority",
@@ -92,12 +92,6 @@
    "options": "Technician"
   },
   {
-   "depends_on": "eval:doc.assigned_technician",
-   "fieldname": "diagonsis_notes",
-   "fieldtype": "Text Editor",
-   "label": "Diagnosis Notes"
-  },
-  {
    "depends_on": "eval:doc.diagnosis_notes",
    "fieldname": "estimated_cost",
    "fieldtype": "Currency",
@@ -156,6 +150,7 @@
    "label": "labour Charge"
   },
   {
+   "fetch_if_empty": 1,
    "fieldname": "setting_link",
    "fieldtype": "Link",
    "hidden": 1,
@@ -188,18 +183,25 @@
    "label": "Remarks"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "status",
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Status",
    "options": "Draft\nPending Diagnosis\nAwaiting Customer Approval\nIn Repair\nReady for Delivery\nDelivered\nCancelled"
+  },
+  {
+   "depends_on": "eval:doc.assigned_technician",
+   "fieldname": "diagnosis_notes",
+   "fieldtype": "Text Editor",
+   "label": "Diagnosis Notes"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-04-28 15:00:10.028904",
+ "modified": "2026-04-29 11:12:48.053375",
  "modified_by": "Administrator",
  "module": "Quickfix",
  "name": "Job Card",

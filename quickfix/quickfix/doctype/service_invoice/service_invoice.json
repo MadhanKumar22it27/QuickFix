@@ -1,12 +1,11 @@
 {
  "actions": [],
  "allow_rename": 1,
- "autoname": "naming_series: naming_series",
+ "autoname": "INV-.YYYY.-.#####",
  "creation": "2026-04-28 15:02:47.095552",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "naming_series",
   "job_card",
   "customer_name",
   "invoice_date",
@@ -16,12 +15,6 @@
   "payment_status"
  ],
  "fields": [
-  {
-   "fieldname": "naming_series",
-   "fieldtype": "Data",
-   "hidden": 1,
-   "label": "Naming Series"
-  },
   {
    "fieldname": "job_card",
    "fieldtype": "Link",
@@ -72,11 +65,11 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-04-28 15:13:04.306594",
+ "modified": "2026-04-29 12:56:17.721213",
  "modified_by": "Administrator",
  "module": "Quickfix",
  "name": "Service Invoice",
- "naming_rule": "By \"Naming Series\" field",
+ "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [
   {
