@@ -91,3 +91,52 @@ Section - C3
         setting a field as "unique" means it enforce the unique constraints in the Database level. In DB, index was created for UNIQUE so, even two users try enter the same data on the same time, it won't allow.
         frappe.db.exists() in validate() means it enforce the unique constraints in the App level. unlike setting a unique field property, it can't prevent the two users put the same data on the same time.
 ```
+
+Section - B1
+
+Step 1 - Routing (write answers in README.md):
+```
+1. When a browser hits /api/method/quickfix.api.get_job_summary - what Python function handles this request and how does Frappe find it?
+
+        When a browser hits /api/method/quickfix.api.get_job_summary, handler function handles this request.
+        first, split the method path. when it see api/method, then it goes to handler.handle(). it imports the api/get_job_summary
+
+2. When a browser hits /api/resource/Job Card/JC-2024-0001 - what happens differently compared to /api/method/?
+
+        When a browser hits /api/resource/Job Card/JC-2024-0001, same handler handles this request but unlike api/method, it goes to REST resource handler. it doesn't require any whitelist method like api/method. api/resourse is working only on DocTypes.
+
+3. When a browser hits /track-job - which file/function handles it and why?
+
+        When a browser hits /track-job, it actually a website, not an API, so it has been handle by the router and website renderer. it checks whether the files are present inside the www folder and fetch the content using the get_context() and renders jinja HTML
+
+```
+Step 2 - Session & CSRF (write answers in README.md):
+```
+1. Open your Frappe site in browser devtools. Find the X-Frappe-CSRF-Token in a POST request. Where does this value come from and what would happen if you omitted it?
+
+        X-Frappe-CSRF-Token is generated for the session and it stored in the cache or frappe.local. if you omitted it, post request was rejected and it throws a CSRF Validation error. it mainly  used for prevent the malicious user to make request for logged-in users.
+
+2. In bench console, run: import frappe; frappe.session.data and describe what it contains
+
+        frappe.session.data contains the data about the logged-in user details such as the user, user type, session id, role and login time.
+```
+Step 3 - Error visibility (write answers in README.md):
+```
+1. With developer_mode: 1 - trigger a Python exception in one of your whitelisted methods. What does the browser receive?
+
+        it shows a full traceback which includes line number and file name. it really useful for the developer to easy to debug
+
+2. Set developer_mode: 0 - repeat. What does the browser receive now? Why is this important for production?
+
+        it shows generic error for the user and actual error goes to server log and error doctype. this is important for production because if the full traceback shows, it might reveals the secret and it leads to security risks
+
+3. Where do production errors go if they are hidden from the browser?
+
+        it remains stay in the error doctype which stores the error logs
+```
+Step 4 - Permission check location:
+```
+1. In a whitelisted method, call frappe.get_doc("Job Card", name) WITHOUT ignore_permissions. Then log in as a QF Technician user who is NOT assigned to that job. What error is raised and at what layer does Frappe stop the request?
+
+        frappe.permissionError is raised in this situation and Frappe does stop the request at the frappe.model.Document.get_doc. normally permission is enforced in the data accesss layer.
+```
