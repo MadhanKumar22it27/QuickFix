@@ -401,3 +401,28 @@ def validate(self):
          other.stock_qty -= self.qty
          other.db_update()
 ```
+
+Section D1
+
+```
+In bench console: call frappe.get_doc_permissions(doc) on a Job Card while logged in as different users. Document what the return dict looks like.
+
+        In [7]: doc = frappe.get_doc("Job Card", "JC-2026-00001")
+        frappe.permissions.get_doc_permissions(doc)
+        Out[7]: 
+        {'select': 1,
+        'read': 1,
+        'write': 1,
+        'create': 1,
+        'delete': 1,
+        'submit': 1,
+        'cancel': 1,
+        'amend': 1,
+        'print': 1,
+        'email': 1,
+        'report': 1,
+        'import': 0,
+        'export': 1,
+        'share': 1}
+
+```
