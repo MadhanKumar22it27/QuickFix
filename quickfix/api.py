@@ -1,59 +1,58 @@
 import frappe
 from frappe import _
 
+# @frappe.whitelist()
+# def customer_decision():
+# 	job_card = frappe.form_dict.get("job_card")
+# 	action = frappe.form_dict.get("action")
 
-@frappe.whitelist()
-def customer_decision():
-	job_card = frappe.form_dict.get("job_card")
-	action = frappe.form_dict.get("action")
+# 	if not job_card or not action:
+# 		frappe.throw(_("Missing parameters"))
 
-	if not job_card or not action:
-		frappe.throw(_("Missing parameters"))
+# 	if not frappe.db.exists("Job Card", job_card):
+# 		frappe.throw(_("Invalid Job Card"))
 
-	if not frappe.db.exists("Job Card", job_card):
-		frappe.throw(_("Invalid Job Card"))
+# 	doc = frappe.get_doc("Job Card", job_card)
 
-	doc = frappe.get_doc("Job Card", job_card)
+# 	# Prevent re-processing
+# 	if doc.status in ["In Repair", "Cancelled"]:
+# 		return {"status": "already_processed", "job_card": doc.name, "new_status": doc.status}
 
-	# Prevent re-processing
-	if doc.status in ["In Repair", "Cancelled"]:
-		return {"status": "already_processed", "job_card": doc.name, "new_status": doc.status}
+# 	if doc.status != "Awaiting Customer Approval":
+# 		frappe.throw(_("This job is not awaiting customer approval"))
 
-	if doc.status != "Awaiting Customer Approval":
-		frappe.throw(_("This job is not awaiting customer approval"))
+# 	if action == "approve":
+# 		doc.status = "In Repair"
 
-	if action == "approve":
-		doc.status = "In Repair"
+# 	elif action == "reject":
+# 		doc.status = "Cancelled"
 
-	elif action == "reject":
-		doc.status = "Cancelled"
+# 	else:
+# 		frappe.throw(_("Invalid action"))
 
-	else:
-		frappe.throw(_("Invalid action"))
+# 	doc.save(ignore_permissions=True)
 
-	doc.save(ignore_permissions=True)
-
-	return {"status": "success", "job_card": doc.name, "new_status": doc.status}
+# 	return {"status": "success", "job_card": doc.name, "new_status": doc.status}
 
 
-@frappe.whitelist()
-def get_job_details():
-	job_card = frappe.form_dict.get("job_card")
+# @frappe.whitelist()
+# def get_job_details():
+# 	job_card = frappe.form_dict.get("job_card")
 
-	if not job_card:
-		return None
+# 	if not job_card:
+# 		return None
 
-	if not frappe.db.exists("Job Card", job_card):
-		return None
+# 	if not frappe.db.exists("Job Card", job_card):
+# 		return None
 
-	doc = frappe.get_doc("Job Card", job_card)
+# 	doc = frappe.get_doc("Job Card", job_card)
 
-	return {
-		"name": doc.name,
-		"customer_name": doc.customer_name,
-		"status": doc.status,
-		"estimated_cost": doc.estimated_cost,
-	}
+# 	return {
+# 		"name": doc.name,
+# 		"customer_name": doc.customer_name,
+# 		"status": doc.status,
+# 		"estimated_cost": doc.estimated_cost,
+# 	}
 
 
 @frappe.whitelist()
@@ -66,3 +65,23 @@ def share_job_card(job_card_name, user_email):
 def manager_only_action():
 	frappe.only_for("QF Manager")
 	return "Manager-only action executed successfully"
+
+
+@frappe.whitelist()
+def get_job_cards_unsafe():
+	return frappe.get_all("Job Card", fields="*")
+
+
+@frappe.whitelist()
+def get_job_cards_safe():
+	import frappe
+
+	user = frappe.session.user
+	is_manager = "QF Manager" in frappe.get_roles(user)
+
+	fields = ["name", "customer_name", "status", "assigned_technician", "final_amount"]
+
+	if is_manager:
+		fields += ["customer_phone", "customer_email"]
+
+	return frappe.get_list("Job Card", fields=fields)

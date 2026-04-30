@@ -426,3 +426,11 @@ In bench console: call frappe.get_doc_permissions(doc) on a Job Card while logge
         'share': 1}
 
 ```
+
+Section D2
+
+```
+What is the issues in using frappe.get_all in a whitelisted method that is exposed to guests or low-privilege users. Explain it in the context of permission_query_conditions
+
+        frappe.all is dangerous beacuse it can bypasses the permission_query_conditions, it gives all the records to anyone and ignore all users. it may leads to data leaks and security risks
+```
