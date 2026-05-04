@@ -10,22 +10,22 @@ class JobCard(Document):
 	def validate(self):
 		# Phone validation
 		if not self.customer_phone or not (self.customer_phone.isdigit() and len(self.customer_phone) == 10):
-			frappe.throw("Customer phone must be exactly 10 digits")
+			frappe.throw(_("Customer phone must be exactly 10 digits"))
 
 		# Technician required
 		if self.status in ["In Repair", "Ready for Delivery", "Delivered"]:
 			if not self.assigned_technician:
-				frappe.throw("Assigned Technician is required for this status")
+				frappe.throw(_("Assigned Technician is required for this status"))
 
 		# Estimated cost required
 		if self.status == "In Repair" and not self.estimated_cost:
-			frappe.throw("Estimated cost is required before starting repair")
+			frappe.throw(_("Estimated cost is required before starting repair"))
 
 		# Compute parts
 		total = 0
 		for row in self.parts_used:
 			if row.quantity <= 0:
-				frappe.throw(f"Quantity must be > 0 for part {row.part}")
+				frappe.throw(_(f"Quantity must be > 0 for part {row.part}"))
 
 			unit_price = row.unit_price or 0
 			row.total_price = row.quantity * unit_price
@@ -35,23 +35,23 @@ class JobCard(Document):
 
 		# Labour charge fallback (safe)
 		if self.labour_charge is None:
-			self.labour_charge = frappe.db.get_value("QuickFix Settings", None, "default_labour_charge") or 0
+			frappe.db.get_single_value("QuickFix Settings", "default_labour_charge")
 
 		# Final amount
 		self.final_amount = self.parts_total + self.labour_charge
 
 	def before_submit(self):
 		if self.status != "Ready for Delivery":
-			frappe.throw("Only Job Cards marked 'Ready for Delivery' can be submitted")
+			frappe.throw(_("Only Job Cards marked 'Ready for Delivery' can be submitted"))
 
 		for row in self.parts_used:
 			stock = frappe.db.get_value("Spare Part", row.part, "stock_qty")
 
 			if stock is None:
-				frappe.throw(f"Spare Part {row.part} not found")
+				frappe.throw(_("Spare Part {0} not found").format(row.part))
 
 			if stock < row.quantity:
-				frappe.throw(f"Not enough stock for part {row.part}. Available: {stock}")
+				frappe.throw(_("Not enough stock for part {0}. Available: {1}").format(row.part, stock))
 
 	def on_submit(self):
 		# Deduct stock (atomic)
@@ -115,7 +115,7 @@ class JobCard(Document):
 
 	def on_trash(self):
 		if self.status not in ["Draft", "Cancelled"]:
-			frappe.throw("Only Draft or Cancelled Job Cards can be deleted")
+			frappe.throw(_("Only Draft or Cancelled Job Cards can be deleted"))
 
 
 def permission_query_conditions(user):
@@ -127,4 +127,4 @@ def permission_query_conditions(user):
 			)
 		"""
 	else:
-		return "Sorry, you don't have permission to view any job cards."
+		return _("Sorry, you don't have permission to view any job cards.")
