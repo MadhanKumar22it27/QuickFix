@@ -11,6 +11,6 @@ class SparePart(Document):
 		self.part_code = self.part_code.upper()
 		self.name = f"PART-{frappe.utils.now_datetime().year}-{self.part_code}"
 
-	def validate(self):
-		if self.selling_price <= self.unit_cost:
-			frappe.throw(_("Selling price must be greater than unit cost"))
+	# def validate(self):
+	# 	if self.selling_price <= self.unit_cost:
+	# 		frappe.throw(_("Selling price must be greater than unit cost"))

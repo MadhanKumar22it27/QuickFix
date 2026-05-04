@@ -85,3 +85,11 @@ def get_job_cards_safe():
 		fields += ["customer_phone", "customer_email"]
 
 	return frappe.get_list("Job Card", fields=fields)
+
+
+@frappe.whitelist()
+def rename_technician(old_name, new_name):
+	frappe.rename_doc("Technician", old_name, new_name, merge=False)
+
+
+# combine two documents	into one by setting merge=True, but be cautious as it will merge all fields and may lead to data loss if not done carefully.
