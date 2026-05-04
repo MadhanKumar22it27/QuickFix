@@ -14,3 +14,6 @@ class SparePart(Document):
 	# def validate(self):
 	# 	if self.selling_price <= self.unit_cost:
 	# 		frappe.throw(_("Selling price must be greater than unit cost"))
+	def on_update(self):
+		threshold = frappe.db.get_value("QuickFix Settings", None, "low_stock_threshold")
+		return threshold

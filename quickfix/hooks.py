@@ -258,3 +258,5 @@ permission_query_conditions = {
 has_permission = {
 	"Service Invoice": "quickfix.quickfix.doctype.service_invoice.service_invoice.has_permission"
 }
+
+override_doctype_class = {"Job Card": "quickfix.quickfix.overrides.custom_job_card.CustomJobCard"}

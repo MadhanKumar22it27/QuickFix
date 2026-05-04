@@ -446,3 +446,23 @@ Call self.save() inside on_update and see to the issues of it and explain them i
                 1) use the frappe.db.set_value, instead of self.save(), or
                 2) move the logic of on_update into validate or before_save
 ```
+
+Section E3
+
+```
+Part B - Upgrade friction analysis:
+1. why is doc_events safer than override_doctype_class for most use cases?
+
+        doc_events is considered safer because it extends behavior without replacing the core controller class. It hooks into lifecycle events such as validate, before_save, or on_submit, allowing custom logic to run alongside existing framework logic.
+
+Part C - Controller method for Spare Part (frappe.db performance):
+In the Spare Part controller, add an on_update method
+• Which of the below pattern would you use and and explain why.
+        doc = frappe.get_doc("QuickFix Settings", "QuickFix Settings")
+        threshold = doc.low_stock_threshold
+        threshold = frappe.db.get_value("QuickFix Settings", None,
+        "low_stock_threshold")
+
+        I will use the frappe.db.get_value, because frappe.get_doc loads the entire document even through we need only one value but frappe.db.get_value fetch the partcular value from database diectly. it is fast compare to frappe.get_doc
+
+```
