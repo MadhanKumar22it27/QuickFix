@@ -40,6 +40,83 @@ class JobCard(Document):
 		# Final amount
 		self.final_amount = self.parts_total + self.labour_charge
 
+	def before_submit(self):
+		if self.status != "Ready for Delivery":
+			frappe.throw("Only Job Cards marked 'Ready for Delivery' can be submitted")
+
+		for row in self.parts_used:
+			stock = frappe.db.get_value("Spare Part", row.part, "stock_qty")
+
+			if stock is None:
+				frappe.throw(f"Spare Part {row.part} not found")
+
+			if stock < row.quantity:
+				frappe.throw(f"Not enough stock for part {row.part}. Available: {stock}")
+
+	def on_submit(self):
+		# Deduct stock (atomic)
+		for row in self.parts_used:
+			frappe.db.sql(
+				"""
+				UPDATE `tabSpare Part`
+				SET stock_qty = stock_qty - %s
+				WHERE name = %s
+			""",
+				(row.quantity, row.part),
+			)
+
+		# Service Invoice creation (safe)
+		invoice_name = frappe.db.get_value("Service Invoice", {"job_card": self.name})
+
+		invoice = None
+		if invoice_name:
+			existing = frappe.get_doc("Service Invoice", invoice_name)
+			if existing.docstatus != 2:
+				invoice = existing
+
+		if not invoice:
+			invoice = frappe.get_doc(
+				{
+					"doctype": "Service Invoice",
+					"job_card": self.name,
+					"labour_charge": self.labour_charge,
+					"parts_total": self.parts_total,
+					"total_amount": self.final_amount,
+					"payment_status": "Unpaid",
+				}
+			)
+			invoice.insert(ignore_permissions=True)
+
+		# Realtime
+		frappe.publish_realtime("job_ready", {"job_card": self.name}, user=self.owner)
+
+		# Async email
+		frappe.enqueue("quickfix.utils.send_job_ready_email", job_card=self.name, queue="short")
+
+	def on_cancel(self):
+		frappe.db.set_value("Job Card", self.name, "status", "Cancelled")
+
+		for row in self.parts_used:
+			frappe.db.sql(
+				"""
+				UPDATE `tabSpare Part`
+				SET stock_qty = stock_qty + %s
+				WHERE name = %s
+			""",
+				(row.quantity, row.part),
+			)
+
+		invoice_name = frappe.db.get_value("Service Invoice", {"job_card": self.name})
+
+		if invoice_name:
+			invoice = frappe.get_doc("Service Invoice", invoice_name)
+			if invoice.docstatus == 1:
+				invoice.cancel()
+
+	def on_trash(self):
+		if self.status not in ["Draft", "Cancelled"]:
+			frappe.throw("Only Draft or Cancelled Job Cards can be deleted")
+
 
 def permission_query_conditions(user):
 	if "QF Technician" in frappe.get_roles(user):

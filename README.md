@@ -434,3 +434,15 @@ What is the issues in using frappe.get_all in a whitelisted method that is expos
 
         frappe.all is dangerous beacuse it can bypasses the permission_query_conditions, it gives all the records to anyone and ignore all users. it may leads to data leaks and security risks
 ```
+
+Section E1
+
+```
+Call self.save() inside on_update and see to the issues of it and explain them in the same readme_internals. Correct the pattern and explain it.
+
+        first, when we save the document, it trigger the on_update method. next, while execute the on_update(), it calls the self.save() and again it triggers the on_update() and so on. it gradually form recursion loop.
+
+        we can prevent this by two methods, they are
+                1) use the frappe.db.set_value, instead of self.save(), or
+                2) move the logic of on_update into validate or before_save
+```
