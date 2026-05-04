@@ -7,75 +7,38 @@ from frappe.model.document import Document
 
 
 class JobCard(Document):
-	# def validate(self):
-	# 	if not self.labour_charge:
-	# 		self.labour_charge = frappe.db.get_single_value("QuickFix Settings", "default_labour_charge")
+	def validate(self):
+		# Phone validation
+		if not self.customer_phone or not (self.customer_phone.isdigit() and len(self.customer_phone) == 10):
+			frappe.throw("Customer phone must be exactly 10 digits")
 
-	# 	if self.assigned_technician and self.status == "Draft":
-	# 		self.status = "Pending Diagnosis"
+		# Technician required
+		if self.status in ["In Repair", "Ready for Delivery", "Delivered"]:
+			if not self.assigned_technician:
+				frappe.throw("Assigned Technician is required for this status")
 
-	# 	if (
-	# 		self.diagnosis_notes
-	# 		and self.estimated_cost
-	# 		and self.diagnosis_date
-	# 		and self.status == "Pending Diagnosis"
-	# 	):
-	# 		self.status = "Awaiting Customer Approval"
+		# Estimated cost required
+		if self.status == "In Repair" and not self.estimated_cost:
+			frappe.throw("Estimated cost is required before starting repair")
 
-	# 	total = 0
+		# Compute parts
+		total = 0
+		for row in self.parts_used:
+			if row.quantity <= 0:
+				frappe.throw(f"Quantity must be > 0 for part {row.part}")
 
-	# 	for row in self.parts_used:
-	# 		if row.quantity <= 0:
-	# 			frappe.throw(_("Quantity must be greater than 0 for {0}").format(row.part))
+			unit_price = row.unit_price or 0
+			row.total_price = row.quantity * unit_price
+			total += row.total_price
 
-	# 		row.total_price = row.quantity * row.unit_price
-	# 		total += row.total_price
+		self.parts_total = total
 
-	# 	self.parts_total = total
-	# 	self.final_amount = self.parts_total + (self.labour_charge or 0)
+		# Labour charge fallback (safe)
+		if self.labour_charge is None:
+			self.labour_charge = frappe.db.get_value("QuickFix Settings", None, "default_labour_charge") or 0
 
-	# def before_submit(self):
-	# 	if self.status != "Ready for Delivery":
-	# 		frappe.throw(_("Only Ready for Delivery jobs can be submitted"))
-
-	# def on_submit(self):
-	# 	for row in self.parts_used:
-	# 		if row.part:
-	# 			current_stock = frappe.db.get_value("Spare Part", row.part, "stock_qty") or 0
-
-	# 			if current_stock < row.quantity:
-	# 				frappe.throw(_("Not enough stock for {0}").format(row.part))
-
-	# 			frappe.db.set_value("Spare Part", row.part, "stock_qty", current_stock - row.quantity)
-
-	# 	existing_invoice = frappe.db.exists("Service Invoice", {"job_card": self.name})
-
-	# 	if not existing_invoice:
-	# 		invoice = frappe.get_doc(
-	# 			{
-	# 				"doctype": "Service Invoice",
-	# 				"naming_series": "INV-.YYYY.-.#####",  # IMPORTANT
-	# 				"job_card": self.name,
-	# 				"labour_charge": self.labour_charge,
-	# 				"parts_total": self.parts_total,
-	# 				"total_amount": self.final_amount,
-	# 				"payment_status": "Unpaid",
-	# 			}
-	# 		)
-
-	# 		invoice.insert(ignore_permissions=True)
-
-	# def on_cancel(self):
-	# 	self.db_set("status", "Cancelled")
-
-	# 	for row in self.parts_used:
-	# 		if row.part:
-	# 			current_stock = frappe.db.get_value("Spare Part", row.part, "stock_qty") or 0
-
-	# 			frappe.db.set_value(
-	# 				"Spare Part", row.part, "stock_qty", current_stock + row.quantity, update_modified=False
-	# 			)
-	pass
+		# Final amount
+		self.final_amount = self.parts_total + self.labour_charge
 
 
 def permission_query_conditions(user):
