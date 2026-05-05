@@ -269,3 +269,13 @@ doc_events = {
 	},
 	"Job Card": {"validate": "quickfix.api.validate_handler"},
 }
+
+after_install = "quickfix.setup.after_install"
+
+before_uninstall = "quickfix.setup.before_uninstall"
+
+extend_bootinfo = "quickfix.boot.extend_bootinfo"
+
+on_session_creation = "quickfix.audit.log_login"
+
+on_logout = "quickfix.audit.log_logout"
