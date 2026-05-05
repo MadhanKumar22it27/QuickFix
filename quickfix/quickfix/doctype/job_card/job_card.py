@@ -41,7 +41,7 @@ class JobCard(Document):
 		self.final_amount = self.parts_total + self.labour_charge
 
 		# multiple handler example
-		print("Controller validate method called")
+		return "Controller validate method called"
 
 	def before_submit(self):
 		if self.status != "Ready for Delivery":
