@@ -479,3 +479,29 @@ Task B - Multiple handler conflict:
 
         Yes, both "*" and specific DocType handler for the same event run. and the execution order is first "*" handler runs, then specific DocType handler runs next.
 ```
+
+Section F3
+
+```
+Asset Hooks:
+1. app_include_js: a JS file loaded only for logged-in desk users and web_include_js: a JS file loaded only for website/portal pages
+what is the difference? When would you use each?
+
+        app_include_js -> a JS File for injected the content into the Desk for logged-in users. this is specially workers and admin related code while web_include_js -> a JS file for injected content into the webpages and portal. this is specially for customers and public users
+
+2. what DocType would use a tree view and why ?
+
+        Only tree DocType would use a tree view because tree view is meant for the hierarchical DocType (Tree DocType) only.
+
+3. explain what bench build --app quickfix does and why assets need cache-busting after JS changes
+
+        When we run the bench command "bench build --app quickfix", it bundles and hash the JS and CSS file. Assesst need cache-busting after JS Changes because after some changes, browser might still use the older version even after we use the "bench clear-cache"
+
+Jinja Hooks:
+1. what is the difference between a Jinja context available in Print Formats vs one available in Web Pages? Are they the same?
+
+        Print Formats -> preloaded doc context, structured and automatic. it already have the document and it just render it nicely. it mainly document-focused.
+        Jinja in WebPage -> empty context and need to full it ourselves. it have blank pages and we need to decide what have to send. it is more flexible but empty by default.
+
+        so, they are not same.
+```

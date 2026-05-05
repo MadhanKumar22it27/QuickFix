@@ -279,3 +279,9 @@ extend_bootinfo = "quickfix.boot.extend_bootinfo"
 on_session_creation = "quickfix.audit.log_login"
 
 on_logout = "quickfix.audit.log_logout"
+
+jinja = {"methods": ["quickfix.utils.get_shop_name"], "filters": ["quickfix.utils.format_job_id"]}
+
+website_route_rules = [{"from_route": "/track-job", "to_route": "track-job"}]
+
+portal_menu_items = [{"title": "Track My Job", "route": "/track-job", "role": "Guest"}]

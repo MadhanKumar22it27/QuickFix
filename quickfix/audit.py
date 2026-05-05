@@ -2,6 +2,8 @@ import frappe
 
 
 def log_change(doc, method):
+	if doc.doctype == "Audit Log":
+		return
 	frappe.get_doc(
 		{
 			"doctype": "Audit Log",

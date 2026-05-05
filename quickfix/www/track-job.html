@@ -1,0 +1,10 @@
+<h2>Track Your Job</h2>
+
+<form method="get">
+    <input type="text" name="phone" placeholder="Enter phone number">
+    <button type="submit">Search</button>
+</form>
+
+{% if frappe.form_dict.phone %}
+    <p>Searching for: {{ frappe.form_dict.phone }}</p>
+{% endif %}
