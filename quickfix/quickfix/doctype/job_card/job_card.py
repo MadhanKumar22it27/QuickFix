@@ -40,6 +40,9 @@ class JobCard(Document):
 		# Final amount
 		self.final_amount = self.parts_total + self.labour_charge
 
+		# multiple handler example
+		print("Controller validate method called")
+
 	def before_submit(self):
 		if self.status != "Ready for Delivery":
 			frappe.throw(_("Only Job Cards marked 'Ready for Delivery' can be submitted"))

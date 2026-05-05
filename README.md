@@ -466,3 +466,16 @@ In the Spare Part controller, add an on_update method
         I will use the frappe.db.get_value, because frappe.get_doc loads the entire document even through we need only one value but frappe.db.get_value fetch the partcular value from database diectly. it is fast compare to frappe.get_doc
 
 ```
+
+Section F1
+
+```
+Task B - Multiple handler conflict:
+1. Register TWO validate handlers on Job Card - one in your main controller and one in doc_events. In README_internals.md: in what order do they run? What happens if both raise a frappe.ValidationError?
+
+        Controller handler runs first and then doc_events handlers run. if both raise a frappe.ValidationError, then first one that raise an error stops the execution and second one will not run.
+
+2. Demonstrate: what happens when you register "*" AND a specific DocType handler for the same event? Do both run?
+
+        Yes, both "*" and specific DocType handler for the same event run. and the execution order is first "*" handler runs, then specific DocType handler runs next.
+```

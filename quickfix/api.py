@@ -93,3 +93,8 @@ def rename_technician(old_name: str, new_name: str) -> None:
 
 
 # combine two documents	into one by setting merge=True, but be cautious as it will merge all fields and may lead to data loss if not done carefully.
+
+
+@frappe.whitelist()
+def validate_handler():
+	print("validate_handler called from API")
