@@ -18,7 +18,7 @@ def after_install():
 			}
 		).insert(ignore_permissions=True)
 
-	frappe.msgprint("QuickFix setup completed successfully ")
+	frappe.msgprint(_("QuickFix setup completed successfully"))
 
 
 def before_uninstall():
