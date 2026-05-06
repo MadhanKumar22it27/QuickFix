@@ -38,7 +38,7 @@ class JobCard(Document):
 			frappe.db.get_single_value("QuickFix Settings", "default_labour_charge")
 
 		# Final amount
-		self.final_amount = self.parts_total + self.labour_charge
+		# self.final_amount = self.parts_total + self.labour_charge
 
 		# multiple handler example
 		return "Controller validate method called"
@@ -122,12 +122,12 @@ class JobCard(Document):
 
 
 def permission_query_conditions(user):
-	if "QF Technician" in frappe.get_roles(user):
+	roles = frappe.get_roles(user)
+	if "QF Technician" in roles and "QF Manager" not in roles:
 		return f"""
 			`tabJob Card`.assigned_technician IN (
 				SELECT name FROM `tabTechnician`
 				WHERE user = {frappe.db.escape(user)}
 			)
 		"""
-	else:
-		return _("Sorry, you don't have permission to view any job cards.")
+	return None

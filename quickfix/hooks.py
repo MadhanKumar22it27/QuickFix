@@ -259,7 +259,7 @@ has_permission = {
 	"Service Invoice": "quickfix.quickfix.doctype.service_invoice.service_invoice.has_permission"
 }
 
-override_doctype_class = {"Job Card": "quickfix.quickfix.overrides.custom_job_card.CustomJobCard"}
+# override_doctype_class = {"Job Card": "quickfix.quickfix.overrides.custom_job_card.CustomJobCard"}
 
 doc_events = {
 	"*": {
@@ -267,7 +267,6 @@ doc_events = {
 		"on_submit": "quickfix.audit.log_change",
 		"on_cancel": "quickfix.audit.log_change",
 	},
-	"Job Card": {"validate": "quickfix.api.validate_handler"},
 }
 
 after_install = "quickfix.setup.after_install"
@@ -285,3 +284,5 @@ jinja = {"methods": ["quickfix.utils.get_shop_name"], "filters": ["quickfix.util
 website_route_rules = [{"from_route": "/track-job", "to_route": "track-job"}]
 
 portal_menu_items = [{"title": "Track My Job", "route": "/track-job", "role": "Guest"}]
+
+override_whitelisted_methods = {"frappe.client.get_count": "quickfix.api.custom_get_count"}

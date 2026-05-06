@@ -1,5 +1,6 @@
 import frappe
 from frappe import _
+from frappe.client import get_count
 
 # @frappe.whitelist()
 # def customer_decision():
@@ -98,3 +99,23 @@ def rename_technician(old_name: str, new_name: str) -> None:
 @frappe.whitelist()
 def validate_handler():
 	return "validate_handler called from API"
+
+
+@frappe.whitelist()
+def custom_get_count(doctype, filters=None, debug=False, cache=False):
+	print(f"DEBUG: custom_get_count called for {doctype}")
+
+	# Log request to Audit Log
+	frappe.get_doc(
+		{
+			"doctype": "Audit Log",
+			"doctype_name": doctype,
+			"document_name": doctype,
+			"action": "count_queried",
+			"user": frappe.session.user,
+		}
+	).insert(ignore_permissions=True)
+
+	count = get_count(doctype, filters=filters, debug=debug, cache=cache)
+
+	return {"doctype": doctype, "filters": filters, "count": count}
